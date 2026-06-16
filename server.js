@@ -28,8 +28,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/api/auth', require('./routes/auth.route')); 
 app.use('/api/shop', require('./routes/shop.route'));
 app.use('/api/payment', require('./routes/payment.route'));
-app.use('/api/admin', require('./routes/admin.route')); // ✅ admin routes ใหม่
-
+app.use('/api/admin', require('./routes/admin.route'));
+app.use('/api', require('./routes/api'));
 
 // =================================================================
 // 🛒 API สำหรับดึงข้อมูลสินค้าจริงจาก Database (MySQL)
