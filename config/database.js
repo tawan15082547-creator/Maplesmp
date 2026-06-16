@@ -1,37 +1,36 @@
-// config/database.js
 const mysql = require('mysql2');
 
-// ดึงค่าคอนฟิกมาจากไฟล์ .env ที่เราตั้งไว้
+// 1. สร้าง Pool โดยเก็บไว้ในตัวแปร pool
 const pool = mysql.createPool({
-    host:     process.env.DB_HOST,
-    port:     parseInt(process.env.DB_PORT) || 3306,
-    user:     process.env.DB_USER,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
     connectTimeout: 10000,
-    ssl: { rejectUnauthorized: false } // Hostinger บางแพลนต้องการ SSL
+    ssl: { rejectUnauthorized: false }
 });
 
-// log ค่าที่ใช้เชื่อมต่อ (ไม่แสดง password)
+// 2. log ค่าที่ใช้เชื่อมต่อ
 console.log('🔌 DB Config:', {
-    host:     process.env.DB_HOST,
-    port:     process.env.DB_PORT,
-    user:     process.env.DB_USER,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
     database: process.env.DB_NAME
 });
 
-// แปลงให้เป็นระบบ Promise เพื่อให้เขียนโค้ดง่ายขึ้น (Async/Await)
+// 3. สร้าง db เป็นเวอร์ชั่น promise โดยใช้ pool
 const db = pool.promise();
 
-// ทดสอบเชื่อมต่อฐานข้อมูลเมื่อเปิดเว็บ
+// 4. ทดสอบเชื่อมต่อ (เปลี่ยนจาก pool เป็น db ในบางกรณี หรือใช้ pool เดิมก็ได้)
 pool.getConnection((err, connection) => {
     if (err) {
         console.error('❌ เชื่อมต่อ Database ล้มเหลว:', err.message);
     } else {
-        console.log('✅ เชื่อมต่อฐานข้อมูล SQL (maple_db) สำเร็จ!');
+        console.log('✅ เชื่อมต่อฐานข้อมูล SQL สำเร็จ!');
         connection.release();
     }
 });
