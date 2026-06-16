@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapleSMP | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/logoweb.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: #03060f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: 220px;
+            height: 100vh;
+            background: #070d1a;
+            border-right: 1px solid #0d2040;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid #0d2040;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-logo h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        .sidebar-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #003d99, #0055cc);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            margin-top: 6px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(0,85,204,0.4);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #4a6080;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            text-decoration: none;
+            border-right: 3px solid transparent;
+        }
+
+        .nav-item:hover { background: #0a1428; color: #7ab0ff; }
+        .nav-item.active { background: #071020; color: #4499ff; border-right-color: #003d99; }
+        .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 220px;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .page-title { font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .page-subtitle { font-size: 0.85rem; color: #2a4060; margin-top: 2px; }
+
+        .refresh-btn {
+            background: #070d1a;
+            border: 1px solid #0d2040;
+            color: #4a6080;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .refresh-btn:hover { border-color: #003d99; color: #4499ff; box-shadow: 0 0 10px rgba(0,61,153,0.3); }
+
+        /* ===== STAT CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #070d1a;
+            border: 1px solid #0d2040;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover { border-color: #1a3a6e; box-shadow: 0 0 16px rgba(0,61,153,0.2); }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px;
+            height: 100%;
+        }
+
+        .stat-card.red::before    { background: linear-gradient(to bottom, #cc0000, #ff4444); }
+        .stat-card.green::before  { background: linear-gradient(to bottom, #00aa44, #00ff66); }
+        .stat-card.blue::before   { background: linear-gradient(to bottom, #003d99, #4499ff); }
+        .stat-card.yellow::before { background: linear-gradient(to bottom, #cc8800, #ffcc00); }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: #6d99da;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .stat-value.red    { color: #ff4444; }
+        .stat-value.green  { color: #00cc55; }
+        .stat-value.blue   { color: #4499ff; }
+        .stat-value.yellow { color: #ffaa00; }
+
+        .stat-sub { font-size: 0.78rem; color: #1a3050; margin-top: 8px; }
+
+        /* ===== TABLE SECTION ===== */
+        .table-section {
+            background: #070d1a;
+            border: 1px solid #0d2040;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid #0d2040;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .table-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .table-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .table-tag {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: #0a1428;
+            color: #2a5080;
+            border: 1px solid #0d2040;
+        }
+
+        /* ===== FILTER / SEARCH CONTROLS ===== */
+        .table-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .filter-select {
+            background: #0a1428;
+            border: 1px solid #0d2040;
+            color: #7ab0ff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .filter-select:focus { border-color: #003d99; }
+
+        .date-input {
+            background: #0a1428;
+            border: 1px solid #0d2040;
+            color: #7ab0ff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .date-input:focus { border-color: #003d99; }
+        .date-input::-webkit-calendar-picker-indicator { filter: invert(0.6) sepia(1) saturate(3) hue-rotate(180deg); cursor: pointer; }
+
+        .search-wrap {
+            position: relative;
+        }
+        .search-input {
+            background: #0a1428;
+            border: 1px solid #0d2040;
+            color: #c0d8ff;
+            padding: 6px 10px 6px 30px;
+            border-radius: 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.82rem;
+            width: 180px;
+            transition: border-color 0.2s, width 0.3s;
+            outline: none;
+        }
+        .search-input:focus { border-color: #003d99; width: 220px; }
+        .search-icon {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            color: #2a5080;
+            pointer-events: none;
+        }
+
+        /* ===== TABLE ===== */
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background: #04080f;
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 0.75rem;
+            color: #2a5080;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 13px 20px;
+            font-size: 0.88rem;
+            border-bottom: 1px solid #090f1e;
+            color: #ccc;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #0a1428; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-completed { background: #011a0a; color: #00cc44; border: 1px solid #006622; }
+        .status-pending   { background: #1a1400; color: #ffaa00; border: 1px solid #664400; }
+        .status-expired   { background: #0f0f0f; color: #444;    border: 1px solid #222; }
+
+        .empty-row td { text-align: center; padding: 32px; color: #1a3050; }
+        .loading-text  { color: #1a3050; font-size: 0.9rem; }
+
+        /* ===== PAGINATION ===== */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 14px 20px;
+            border-top: 1px solid #0d2040;
+        }
+
+        .page-btn {
+            background: #0a1428;
+            border: 1px solid #0d2040;
+            color: #4a6080;
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-btn:hover  { border-color: #003d99; color: #4499ff; }
+        .page-btn.active { background: #003d99; border-color: #003d99; color: #fff; }
+        .page-btn:disabled { opacity: 0.3; cursor: default; }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <img src="/images/logo.png" alt="Logo" style="width: 160px; height: auto;">
+        <div class="sidebar-badge">ADMIN</div>
+    </div>
+    <a href="/admin/dashboard" class="nav-item active">
+        <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <a href="/admin/coupons" class="nav-item">
+        <span class="nav-icon">🎟️</span> ประวัติคูปอง
+    </a>
+    <a href="/home" class="nav-item">
+        <span class="nav-icon">🏠</span> หน้าร้านค้า
+    </a>
+</div>
+
+<!-- Main -->
+<div class="main">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Dashboard</div>
+            <div class="page-subtitle" id="lastUpdate">กำลังโหลด...</div>
+        </div>
+        <button class="refresh-btn" onclick="loadAll()">🔄 รีเฟรช</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card red">
+            <div class="stat-label">ยอดเงินวันนี้</div>
+            <div class="stat-value red" id="todayRevenue">-</div>
+            <div class="stat-sub">บาท</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-label">ยอดเงินเดือนนี้</div>
+            <div class="stat-value green" id="monthRevenue">-</div>
+            <div class="stat-sub">บาท</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-label">ผู้เล่นทั้งหมด</div>
+            <div class="stat-value blue" id="totalUsers">-</div>
+            <div class="stat-sub">บัญชี</div>
+        </div>
+        <div class="stat-card yellow">
+            <div class="stat-label">Order รอชำระ</div>
+            <div class="stat-value yellow" id="pendingOrders">-</div>
+            <div class="stat-sub">รายการ</div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="table-section">
+        <div class="table-header">
+            <!-- หัวข้อ + แท็ก 20 รายการ -->
+            <div class="table-title-group">
+                <div class="table-title">📋 รายการสั่งซื้อล่าสุด</div>
+                <span class="table-tag">20 รายการ / หน้า</span>
+            </div>
+            <!-- Controls: Filter | Calendar | Search (ซ้าย→ขวา, ชิดขวา) -->
+            <div class="table-controls">
+                <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+                    <option value="">📋 ทั้งหมด</option>
+                    <option value="pending">⏳ รอชำระ</option>
+                    <option value="completed">✅ สำเร็จ</option>
+                    <option value="expired">❌ หมดอายุ</option>
+                </select>
+                <input type="date" class="date-input" id="dateFilter" onchange="applyFilters()" title="กรองตามวันที่">
+                <div class="search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="searchInput"
+                           placeholder="ค้นหาชื่อ / Order ID..."
+                           oninput="applyFilters()">
+                </div>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>ผู้เล่น</th>
+                    <th>สินค้า</th>
+                    <th>ยอด (THB)</th>
+                    <th>คูปอง</th>
+                    <th>วิธีชำระ</th>
+                    <th>สถานะ</th>
+                    <th>เวลา</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTable">
+                <tr class="empty-row"><td colspan="7" class="loading-text">กำลังโหลด...</td></tr>
+            </tbody>
+        </table>
+        <div class="pagination" id="ordersPagination"></div>
+    </div>
+
+    <!-- Top Players -->
+    <div class="table-section">
+        <div class="table-header">
+            <div class="table-title-group">
+                <div class="table-title">👑 ผู้สนับสนุนสูงสุด</div>
+                <span class="table-tag">Top 10</span>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ชื่อผู้เล่น</th>
+                    <th>ยอดเติมรวม (THB)</th>
+                    <th>จำนวน Order</th>
+                    <th>เวอร์ชั่น</th>
+                </tr>
+            </thead>
+            <tbody id="topPlayersTable">
+                <tr class="empty-row"><td colspan="5" class="loading-text">กำลังโหลด...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+// ===== STATE =====
+let allOrders   = [];
+let currentPage = 1;
+const PAGE_SIZE = 20;
+
+// ===== LOAD ALL =====
+async function loadAll() {
+    await Promise.all([loadStats(), loadOrders(), loadTopPlayers()]);
+    document.getElementById('lastUpdate').innerText =
+        'อัปเดตล่าสุด: ' + new Date().toLocaleString('th-TH');
+}
+
+// ===== STATS =====
+async function loadStats() {
+    try {
+        const res  = await fetch('/api/admin/stats');
+        const data = await res.json();
+        document.getElementById('todayRevenue').innerText  = (data.today_revenue  || 0).toLocaleString();
+        document.getElementById('monthRevenue').innerText  = (data.month_revenue  || 0).toLocaleString();
+        document.getElementById('totalUsers').innerText    = (data.total_users    || 0).toLocaleString();
+        document.getElementById('pendingOrders').innerText = (data.pending_orders || 0).toLocaleString();
+    } catch (e) { console.error('Stats error', e); }
+}
+
+// ===== ORDERS (fetch all, filter/paginate client-side) =====
+async function loadOrders() {
+    try {
+        const res  = await fetch('/api/admin/orders');
+        const data = await res.json();
+        allOrders   = data.orders || [];
+        currentPage = 1;
+        applyFilters();
+    } catch (e) {
+        document.getElementById('ordersTable').innerHTML =
+            '<tr class="empty-row"><td colspan="7" style="color:#ff4444;">โหลดไม่สำเร็จ</td></tr>';
+    }
+}
+
+// ===== FILTER + SEARCH + PAGINATE =====
+function applyFilters() {
+    const status  = document.getElementById('statusFilter').value;
+    const dateVal = document.getElementById('dateFilter').value;   // "YYYY-MM-DD"
+    const q       = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    let filtered = allOrders.filter(o => {
+        if (status && o.status !== status) return false;
+        if (dateVal) {
+            // เปรียบเทียบแค่วันที่ (ตัด timezone ออก)
+            const oDate = new Date(o.created_at).toISOString().slice(0, 10);
+            if (oDate !== dateVal) return false;
+        }
+        if (q) {
+            const inId   = o.id.toLowerCase().includes(q);
+            const inName = (o.username || '').toLowerCase().includes(q);
+            if (!inId && !inName) return false;
+        }
+        return true;
+    });
+
+    renderOrdersPage(filtered, 1);
+}
+
+function renderOrdersPage(rows, page) {
+    currentPage = page;
+    const tbody    = document.getElementById('ordersTable');
+    const pagDiv   = document.getElementById('ordersPagination');
+    const total    = rows.length;
+    const totalPg  = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const start    = (page - 1) * PAGE_SIZE;
+    const slice    = rows.slice(start, start + PAGE_SIZE);
+
+    if (slice.length === 0) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="8">ไม่พบรายการที่ตรงกัน</td></tr>';
+        pagDiv.innerHTML = '';
+        return;
+    }
+
+    tbody.innerHTML = slice.map(o => `
+        <tr>
+            <td style="color:#2a5080; font-size:0.78rem;">${o.id}</td>
+            <td style="color:#fff; font-weight:600;">${o.username || '-'}</td>
+            <td style="color:#7ab0ff;">${o.product_name || 'หลายรายการ'}</td>
+            <td style="color:#00cc44; font-weight:600;">${parseFloat(o.final_amount).toLocaleString()}</td>
+            <td style="color:${o.coupon_code ? '#ffaa00' : '#2a5080'}; font-size:0.82rem;">
+                ${o.coupon_code ? `🎟️ ${o.coupon_code}` : '—'}
+            </td>
+            <td style="color:#4a6080;">${o.payment_method}</td>
+            <td><span class="status-badge status-${o.status}">${
+                o.status === 'completed' ? '✅ สำเร็จ' :
+                o.status === 'pending'   ? '⏳ รอชำระ' : '❌ หมดอายุ'
+            }</span></td>
+            <td style="color:#2a5080; font-size:0.8rem;">${new Date(o.created_at).toLocaleString('th-TH')}</td>
+        </tr>
+    `).join('');
+
+    // Pagination buttons
+    if (totalPg <= 1) { pagDiv.innerHTML = ''; return; }
+
+    let btns = '';
+    btns += `<button class="page-btn" onclick="renderOrdersPage(window._filteredRows,${page-1})" ${page===1?'disabled':''}>‹</button>`;
+    for (let i = 1; i <= totalPg; i++) {
+        btns += `<button class="page-btn ${i===page?'active':''}" onclick="renderOrdersPage(window._filteredRows,${i})">${i}</button>`;
+    }
+    btns += `<button class="page-btn" onclick="renderOrdersPage(window._filteredRows,${page+1})" ${page===totalPg?'disabled':''}>›</button>`;
+    pagDiv.innerHTML = btns;
+
+    // เก็บ reference ไว้ให้ pagination ใช้
+    window._filteredRows = rows;
+}
+
+// ===== TOP PLAYERS =====
+async function loadTopPlayers() {
+    const tbody = document.getElementById('topPlayersTable');
+    try {
+        const res  = await fetch('/api/admin/top-players');
+        const data = await res.json();
+        if (!data.players || data.players.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="5">ยังไม่มีข้อมูล</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.players.map((p, i) => `
+            <tr>
+                <td style="color:${i===0?'#ffaa00':i===1?'#aaa':i===2?'#cc6600':'#2a5080'}; font-weight:700;">
+                    ${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}
+                </td>
+                <td style="color:#fff; font-weight:600;">${p.username}</td>
+                <td style="color:#00cc44; font-weight:700;">${parseFloat(p.total_spent).toLocaleString()}</td>
+                <td style="color:#4a6080;">${p.order_count}</td>
+                <td style="color:#2a5080;">${p.game_version}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="color:#ff4444;">โหลดไม่สำเร็จ</td></tr>';
+    }
+}
+
+// ===== COUPONS =====
+loadAll();
+setInterval(loadAll, 30000);
+</script>
+</body>
+</html>

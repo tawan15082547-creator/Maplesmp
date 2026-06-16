@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapleSMP | ชำระเงิน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/logoweb.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Kanit', sans-serif; }
+
+        body {
+            background: #050a14;
+            background-image: radial-gradient(ellipse at top, #0d1a33 0%, #050a14 60%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .pay-navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 40px;
+            background: rgba(0,0,0,0.7);
+            border-bottom: 1px solid #001a4d;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .pay-navbar img { height: 38px; }
+        .btn-back-home {
+            background: transparent;
+            border: 1px solid #334;
+            color: #aaa;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-back-home:hover { border-color: #fff; color: #fff; }
+
+        /* ===== MAIN LAYOUT ===== */
+        .pay-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 20px 60px;
+        }
+
+        .pay-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .pay-subtitle {
+            color: #556;
+            font-size: 0.9rem;
+            margin-bottom: 32px;
+        }
+
+        .pay-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 28px;
+        }
+
+        /* ===== CARD BASE ===== */
+        .pay-card {
+            background: linear-gradient(145deg, #0d1420, #080d18);
+            border: 1px solid #0f2040;
+            border-radius: 18px;
+            padding: 28px;
+        }
+        .pay-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #99bbff;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== QR SECTION ===== */
+        .qr-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+        .qr-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 0 40px rgba(0, 100, 255, 0.25);
+        }
+        .qr-box img {
+            width: 240px;
+            height: 240px;
+            display: block;
+        }
+        .qr-amount-badge {
+            background: linear-gradient(135deg, #003d99, #0055ff);
+            border-radius: 12px;
+            padding: 14px 30px;
+            text-align: center;
+            width: 100%;
+        }
+        .qr-amount-badge .label { color: #99bbff; font-size: 0.85rem; }
+        .qr-amount-badge .amount { color: #fff; font-size: 2rem; font-weight: 700; }
+        .qr-amount-badge .unit { color: #99bbff; font-size: 0.9rem; }
+
+        /* Timer */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,50,50,0.08);
+            border: 1px solid rgba(255,50,50,0.2);
+            border-radius: 10px;
+        }
+        .timer-icon { font-size: 1.2rem; }
+        .timer-text { color: #ccc; font-size: 0.9rem; }
+        .timer-count { color: #ff4444; font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+
+        /* Download btn */
+        .btn-dl {
+            width: 100%;
+            padding: 11px;
+            background: transparent;
+            border: 1px solid #0f3080;
+            color: #99bbff;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        .btn-dl:hover { background: #0f3080; color: #fff; }
+
+        /* ===== SLIP UPLOAD ===== */
+        .slip-box {
+            border: 2px dashed #1a3a6a;
+            border-radius: 14px;
+            padding: 20px;
+            background: rgba(0,60,150,0.05);
+            margin-top: 18px;
+            transition: border-color 0.2s;
+        }
+        .slip-box:hover { border-color: #0055ff; }
+        .slip-box h4 { color: #ffaa00; font-size: 0.95rem; margin-bottom: 14px; }
+        .slip-file-input {
+            width: 100%;
+            padding: 10px;
+            background: #0a1020;
+            border: 1px solid #1a3a6a;
+            border-radius: 8px;
+            color: #ccc;
+            font-family: 'Kanit', sans-serif;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        .btn-submit-slip {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #00a63e, #00cc4d);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-submit-slip:hover { filter: brightness(1.1); }
+        #slipStatusMessage {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            min-height: 22px;
+        }
+
+        /* ===== ORDER INFO ===== */
+        .order-info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border-left: 3px solid #0f3080;
+        }
+        .order-row .key { color: #556; font-size: 0.88rem; }
+        .order-row .val { color: #dde; font-size: 0.95rem; font-weight: 600; }
+        .order-row .val.highlight { color: #4af; }
+        .order-row .val.price { color: #ff6060; font-size: 1.1rem; }
+
+        /* ===== ITEMS TABLE ===== */
+        .items-table-title {
+            font-size: 0.95rem;
+            color: #99bbff;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .items-table thead tr {
+            background: #0a1a40;
+        }
+        .items-table th {
+            padding: 10px 14px;
+            text-align: left;
+            color: #556;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #0f2040;
+        }
+        .items-table td {
+            padding: 12px 14px;
+            color: #ccd;
+            font-size: 0.92rem;
+            border-bottom: 1px solid #0a1428;
+        }
+        .items-table tbody tr:last-child td { border-bottom: none; }
+        .items-table tbody tr:hover td { background: rgba(0,60,150,0.1); }
+        .item-name-cell { color: #fff; font-weight: 600; }
+        .item-price-cell { color: #4af; font-weight: 600; }
+        .item-qty-badge {
+            display: inline-block;
+            background: #0f2040;
+            color: #99bbff;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+        }
+
+        /* ===== STATUS BAR ===== */
+        .pay-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            background: rgba(0,40,120,0.15);
+            border: 1px solid #0f2040;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        .spinner {
+            width: 22px; height: 22px;
+            border: 3px solid #0f2040;
+            border-top: 3px solid #4af;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            flex-shrink: 0;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .pay-status-bar p { color: #99bbff; font-size: 0.95rem; margin: 0; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .pay-grid { grid-template-columns: 1fr; }
+            .pay-navbar { padding: 12px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="pay-navbar">
+    <img src="/images/logo.png" alt="MapleSMP Logo">
+    <button class="btn-back-home" onclick="window.location.href='/home'">← กลับหน้าร้านค้า</button>
+</nav>
+
+<div class="pay-container">
+    <div class="pay-title">💳 ชำระเงิน</div>
+    <div class="pay-subtitle">สแกน QR Code และอัปโหลดสลิปหลังโอนเงิน</div>
+
+    <div class="pay-grid">
+
+        <!-- ===== LEFT: QR + SLIP ===== -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+            <div class="pay-card">
+                <div class="pay-card-title">📱 <span id="paymentMethodTitle">PromptPay</span></div>
+                <div class="qr-wrapper">
+                    <div class="qr-box">
+                        <img id="paymentQrImg" src="" alt="QR Code">
+                    </div>
+
+                    <div class="qr-amount-badge">
+                        <div class="label">ยอดที่ต้องชำระ</div>
+                        <div class="amount"><span id="paymentAmount">0</span></div>
+                        <div class="unit">บาท (THB)</div>
+                    </div>
+
+                    <div class="timer-row">
+                        <span class="timer-icon">⏱️</span>
+                        <span class="timer-text">หมดเวลาใน</span>
+                        <span class="timer-count" id="countdownTimer">15:00</span>
+                    </div>
+
+                    <button class="btn-dl" id="downloadQrBtn">📥 บันทึก QR Code</button>
+                </div>
+            </div>
+
+            <!-- SLIP UPLOAD -->
+            <div class="pay-card">
+                <div class="pay-card-title">🧾 อัปโหลดสลิปการโอน</div>
+                <div class="slip-box">
+                    <h4>โอนเงินเสร็จแล้ว? แนบสลิปที่นี่เพื่อยืนยัน</h4>
+                    <form id="slipForm" enctype="multipart/form-data">
+                        <input type="hidden" id="slipOrderId" name="orderId">
+                        <input type="file" id="slipImage" name="slipImage" accept="image/*" required class="slip-file-input">
+                        <button type="submit" class="btn-submit-slip">🚀 ส่งสลิปและยืนยันการชำระ</button>
+                    </form>
+                    <div id="slipStatusMessage"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== RIGHT: ORDER INFO + ITEMS ===== -->
+        <div class="pay-card">
+            <div class="pay-card-title">📋 รายละเอียดคำสั่งซื้อ</div>
+
+            <div class="order-info-grid">
+                <div class="order-row">
+                    <span class="key">รหัสคำสั่งซื้อ</span>
+                    <span class="val highlight" id="orderId">—</span>
+                </div>
+                <div class="order-row">
+                    <span class="key">ชื่อผู้เล่น</span>
+                    <span class="val" id="orderPlayerName">—</span>
+                </div>
+                <div class="order-row">
+                    <span class="key">วิธีชำระเงิน</span>
+                    <span class="val" id="orderPaymentMethod">—</span>
+                </div>
+                <div class="order-row">
+                    <span class="key">สั่งซื้อเมื่อ</span>
+                    <span class="val" id="orderDateTime">—</span>
+                </div>
+                <div class="order-row">
+                    <span class="key">สรุปยอดชำระ</span>
+                    <span class="val price"><span id="orderTotal">0</span> THB</span>
+                </div>
+            </div>
+
+            <!-- ITEMS TABLE -->
+            <div class="items-table-title">🛒 สินค้าที่สั่งซื้อ</div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>สินค้า</th>
+                        <th>จำนวน</th>
+                        <th>ราคา</th>
+                    </tr>
+                </thead>
+                <tbody id="orderItemsList">
+                    <tr><td colspan="3" style="text-align:center; color:#334; padding:20px;">กำลังโหลด...</td></tr>
+                </tbody>
+            </table>
+
+            <!-- STATUS -->
+            <div class="pay-status-bar" id="paymentStatusSection">
+                <div class="spinner"></div>
+                <p id="paymentStatusMsg">กำลังรอการชำระเงิน...</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// ดึงข้อมูล session ที่บันทึกไว้
+const currentUser = JSON.parse(sessionStorage.getItem('userSession') || 'null');
+if (!currentUser) { window.location.href = '/home'; }
+
+// ดึง orderId จาก URL query string เช่น /payment?orderId=WM-xxx
+const urlParams   = new URLSearchParams(window.location.search);
+const pendingData = JSON.parse(sessionStorage.getItem('pendingPayment') || 'null');
+
+if (!pendingData) {
+    window.location.href = '/home';
+}
+
+// แสดงข้อมูลหน้าเพจ
+document.getElementById('paymentMethodTitle').innerText = pendingData.method || 'PromptPay';
+document.getElementById('paymentAmount').innerText      = (pendingData.amount || 0).toLocaleString();
+document.getElementById('orderPlayerName').innerText    = currentUser.username;
+document.getElementById('orderPaymentMethod').innerText = pendingData.method || 'PromptPay';
+document.getElementById('orderDateTime').innerText      = pendingData.dateTime || new Date().toLocaleString('th-TH');
+document.getElementById('orderTotal').innerText         = (pendingData.amount || 0).toLocaleString();
+
+// แสดงตารางสินค้า
+const cart = pendingData.items || [];
+const tbody = document.getElementById('orderItemsList');
+tbody.innerHTML = '';
+cart.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td class="item-name-cell">${item.name}</td>
+        <td><span class="item-qty-badge">x${item.quantity}</span></td>
+        <td class="item-price-cell">${(item.price * item.quantity).toLocaleString()} ฿</td>
+    `;
+    tbody.appendChild(tr);
+});
+
+// ยิง API generate-qr และเริ่มระบบ — เซฟ orderId และเวลาไว้ใน sessionStorage
+(async () => {
+    try {
+        // ✅ ถ้ามี orderId เก่าอยู่แล้ว (รีเฟรช) ให้ใช้ของเดิม ไม่สร้างใหม่
+        let orderId  = pendingData.orderId  || null;
+        let qrcode   = pendingData.qrcode   || null;
+        let expireAt = pendingData.expireAt || null;
+
+        if (!orderId || !qrcode) {
+            // สร้าง order ใหม่ครั้งแรก
+            const res  = await fetch('/api/payment/generate-qr', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    amount: pendingData.amount,
+                    items:  pendingData.items,
+                    method: pendingData.method
+                })
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data.qrcode) {
+                document.getElementById('paymentStatusMsg').innerText = '❌ โหลด QR Code ไม่สำเร็จ: ' + (data.error || '');
+                return;
+            }
+
+            orderId  = data.orderId;
+            qrcode   = data.qrcode;
+            expireAt = Date.now() + (15 * 60 * 1000);
+
+            sessionStorage.setItem('pendingPayment', JSON.stringify({
+                ...pendingData,
+                orderId,
+                qrcode,
+                expireAt
+            }));
+        }
+
+        document.getElementById('paymentQrImg').src  = qrcode;
+        document.getElementById('orderId').innerText = orderId;
+        document.getElementById('slipOrderId').value = orderId;
+
+        // คำนวณเวลาที่เหลือจาก expireAt จริง (ไม่ reset ตอนรีเฟรช)
+        const secondsLeft = Math.max(0, Math.floor((expireAt - Date.now()) / 1000));
+        startCountdown(secondsLeft);
+        startPaymentPolling(orderId);
+
+    } catch (e) {
+        document.getElementById('paymentStatusMsg').innerText = '❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้';
+    }
+})();
+
+// ===== POLLING =====
+function startPaymentPolling(orderId) {
+    if (window.paymentIntervalId) clearInterval(window.paymentIntervalId);
+    window.paymentIntervalId = setInterval(async () => {
+        try {
+            const res  = await fetch(`/api/payment/check-status/${orderId}`);
+            const data = await res.json();
+            if (data.status === 'completed') {
+                clearInterval(window.paymentIntervalId);
+                sessionStorage.removeItem('pendingPayment');
+                if (currentUser) {
+                    currentUser.points = data.new_balance;
+                    sessionStorage.setItem('userSession', JSON.stringify(currentUser));
+                }
+                document.getElementById('paymentStatusSection').innerHTML = `
+                    <div style="text-align:center; width:100%; padding:10px;">
+                        <div style="font-size:2.5rem; margin-bottom:8px;">✅</div>
+                        <div style="color:#00ff88; font-size:1.1rem; font-weight:700;">ชำระเงินสำเร็จ! กำลังส่งสินค้าเข้าเกม...</div>
+                    </div>`;
+                setTimeout(() => { window.location.href = '/home'; }, 3000);
+            }
+        } catch (e) { console.error('Polling error', e); }
+    }, 4000);
+}
+
+// ===== COUNTDOWN =====
+function startCountdown(seconds) {
+    const el = document.getElementById('countdownTimer');
+    const interval = setInterval(() => {
+        seconds--;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        el.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        if (seconds <= 0) {
+            clearInterval(interval);
+            el.innerText = 'หมดเวลา';
+            el.style.color = '#888';
+        }
+    }, 1000);
+}
+
+// ===== SLIP UPLOAD =====
+document.getElementById('slipForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById('slipStatusMessage');
+    msgEl.innerText = 'กำลังตรวจสอบสลิป...';
+    msgEl.style.color = '#ffaa00';
+
+    const formData = new FormData(e.target);
+    try {
+        const res  = await fetch('/api/payment/check-slip', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            msgEl.innerText = '🎉 ยืนยันสลิปสำเร็จ! กำลังเติม Gems...';
+            msgEl.style.color = '#00ff88';
+
+            // แสดง popup แนะนำให้ login ใหม่
+            setTimeout(() => {
+                alert('✅ ชำระเงินสำเร็จ!\n\n💡 กรุณา Login เข้าสู่ระบบใหม่อีกครั้ง\nเพื่อให้ยอด Gems อัปเดตเป็นปัจจุบัน');
+                sessionStorage.removeItem('pendingPayment');
+                window.location.href = '/home';
+            }, 1500);
+        } else {
+            msgEl.innerText = `❌ ${data.error || 'สลิปไม่ถูกต้องหรือถูกใช้ไปแล้ว'}`;
+            msgEl.style.color = '#ff4444';
+        }
+    } catch {
+        msgEl.innerText = '❌ เกิดข้อผิดพลาดในการส่งสลิป';
+        msgEl.style.color = '#ff4444';
+    }
+};
+
+// ===== DOWNLOAD QR =====
+document.getElementById('downloadQrBtn').onclick = () => {
+    const img = document.getElementById('paymentQrImg');
+    if (!img.src) return;
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = 'qrcode-maplesmp.png';
+    a.click();
+};
+</script>
+</body>
+</html>

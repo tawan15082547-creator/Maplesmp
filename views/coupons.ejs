@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEBMINE | ประวัติคูปอง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/logoweb.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; background: #03060f; color: #e0e0e0; min-height: 100vh; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+            background: #070d1a; border-right: 1px solid #0d2040;
+            display: flex; flex-direction: column; padding: 24px 0; z-index: 100;
+        }
+        .sidebar-logo { padding: 0 24px 24px; border-bottom: 1px solid #0d2040; margin-bottom: 16px; }
+        .sidebar-logo h1 { font-size: 1.3rem; font-weight: 700; color: #fff; letter-spacing: 2px; }
+        .sidebar-badge {
+            display: inline-block; background: linear-gradient(135deg, #003d99, #0055cc);
+            color: #fff; font-size: 0.65rem; padding: 2px 10px; border-radius: 10px; margin-top: 6px; letter-spacing: 2px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 24px;
+            color: #4a6080; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;
+            text-decoration: none; border-right: 3px solid transparent;
+        }
+        .nav-item:hover { background: #0a1428; color: #7ab0ff; }
+        .nav-item.active { background: #071020; color: #4499ff; border-right-color: #003d99; }
+        .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+
+        .main { margin-left: 220px; padding: 32px; min-height: 100vh; }
+
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px;
+        }
+        .page-title { font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .page-subtitle { font-size: 0.85rem; color: #2a4060; margin-top: 2px; }
+
+        .btn-row { display: flex; gap: 10px; }
+
+        .refresh-btn {
+            background: #070d1a; border: 1px solid #0d2040; color: #4a6080;
+            padding: 8px 16px; border-radius: 8px; cursor: pointer;
+            font-family: 'Kanit', sans-serif; font-size: 0.85rem; transition: all 0.2s;
+        }
+        .refresh-btn:hover { border-color: #003d99; color: #4499ff; }
+
+        .add-btn {
+            background: linear-gradient(135deg, #003d99, #0055cc); border: none; color: #fff;
+            padding: 8px 16px; border-radius: 8px; cursor: pointer;
+            font-family: 'Kanit', sans-serif; font-size: 0.85rem; font-weight: 600; transition: opacity 0.2s;
+        }
+        .add-btn:hover { opacity: 0.85; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+
+        .stat-card {
+            background: #070d1a; border: 1px solid #0d2040; border-radius: 12px;
+            padding: 20px; position: relative; overflow: hidden;
+        }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; }
+        .stat-card.yellow::before { background: linear-gradient(to bottom, #cc8800, #ffcc00); }
+        .stat-card.green::before  { background: linear-gradient(to bottom, #00aa44, #00ff66); }
+        .stat-card.blue::before   { background: linear-gradient(to bottom, #003d99, #4499ff); }
+        .stat-label { font-size: 0.78rem; color: #6d99da; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+        .stat-value.yellow { color: #ffaa00; }
+        .stat-value.green  { color: #00cc55; }
+        .stat-value.blue   { color: #4499ff; }
+        .stat-sub { font-size: 0.78rem; color: #1a3050; margin-top: 8px; }
+
+        /* Form */
+        .form-section {
+            background: #070d1a; border: 1px solid #0d2040; border-radius: 12px;
+            padding: 24px; margin-bottom: 24px; display: none;
+        }
+        .form-section.show { display: block; }
+        .form-title { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #0d2040; }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 0.8rem; color: #4a6080; letter-spacing: 1px; }
+        .form-input, .form-select {
+            background: #0a1428; border: 1px solid #0d2040; color: #fff;
+            padding: 10px 12px; border-radius: 8px; font-family: 'Kanit', sans-serif;
+            font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-select:focus { border-color: #003d99; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-save {
+            background: linear-gradient(135deg, #003d99, #0055cc); border: none; color: #fff;
+            padding: 10px 24px; border-radius: 8px; cursor: pointer;
+            font-family: 'Kanit', sans-serif; font-size: 0.9rem; font-weight: 600; transition: opacity 0.2s;
+        }
+        .btn-save:hover { opacity: 0.85; }
+        .btn-cancel {
+            background: #0a1428; border: 1px solid #0d2040; color: #4a6080;
+            padding: 10px 24px; border-radius: 8px; cursor: pointer;
+            font-family: 'Kanit', sans-serif; font-size: 0.9rem; transition: all 0.2s;
+        }
+        .btn-cancel:hover { color: #fff; border-color: #1a3060; }
+        .form-msg { margin-top: 12px; font-size: 0.88rem; text-align: center; min-height: 20px; }
+        .form-msg.success { color: #00cc44; }
+        .form-msg.error   { color: #ff4444; }
+
+        /* Table */
+        .table-section {
+            background: #070d1a; border: 1px solid #0d2040; border-radius: 12px;
+            overflow: hidden; margin-bottom: 24px;
+        }
+        .table-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px; border-bottom: 1px solid #0d2040;
+        }
+        .table-title { font-size: 0.95rem; font-weight: 600; color: #fff; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #050b18; padding: 12px 20px; text-align: left;
+            font-size: 0.75rem; color: #2a5080; letter-spacing: 1px; text-transform: uppercase;
+        }
+        td { padding: 13px 20px; font-size: 0.88rem; border-bottom: 1px solid #0a1428; color: #ccc; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #0a1428; }
+        .empty-row td { text-align: center; padding: 32px; color: #2a4060; }
+
+        .toggle-btn {
+            background: none; border: 1px solid #0d2040; color: #4a6080;
+            padding: 4px 12px; border-radius: 6px; cursor: pointer;
+            font-family: 'Kanit', sans-serif; font-size: 0.8rem; transition: all 0.2s;
+        }
+        .toggle-btn:hover { border-color: #cc0000; color: #ff4444; }
+        .toggle-btn.on { border-color: #00cc44; color: #00cc44; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h1>WEBMINE</h1>
+        <div class="sidebar-badge">ADMIN</div>
+    </div>
+    <a href="/admin/dashboard" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="/admin/coupons" class="nav-item active"><span class="nav-icon">🎟️</span> ประวัติคูปอง</a>
+    <a href="/home" class="nav-item"><span class="nav-icon">🏠</span> หน้าร้านค้า</a>
+</div>
+
+<div class="main">
+    <div class="page-header">
+        <div>
+            <div class="page-title">🎟️ ประวัติคูปอง</div>
+            <div class="page-subtitle" id="lastUpdate">กำลังโหลด...</div>
+        </div>
+        <div class="btn-row">
+            <button class="refresh-btn" onclick="loadCoupons()">🔄 รีเฟรช</button>
+            <button class="add-btn" onclick="toggleForm()">➕ สร้างคูปองใหม่</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card yellow">
+            <div class="stat-label">คูปองทั้งหมด</div>
+            <div class="stat-value yellow" id="totalCoupons">-</div>
+            <div class="stat-sub">รหัส</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-label">ลดไปทั้งหมด</div>
+            <div class="stat-value green" id="totalDiscount">-</div>
+            <div class="stat-sub">บาท</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-label">ใช้งานไปแล้ว</div>
+            <div class="stat-value blue" id="totalUses">-</div>
+            <div class="stat-sub">ครั้ง</div>
+        </div>
+    </div>
+
+    <div class="form-section" id="addCouponForm">
+        <div class="form-title">➕ สร้างคูปองใหม่</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">รหัสคูปอง</label>
+                <input type="text" class="form-input" id="newCode" placeholder="เช่น SUMMER30" style="text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+                <label class="form-label">ประเภทส่วนลด</label>
+                <select class="form-select" id="newType">
+                    <option value="percentage">% เปอร์เซ็นต์</option>
+                    <option value="fixed">฿ จำนวนบาทคงที่</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">ค่าส่วนลด</label>
+                <input type="number" class="form-input" id="newValue" placeholder="เช่น 20 หรือ 50" min="1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">จำกัดการใช้ (ครั้ง)</label>
+                <input type="number" class="form-input" id="newMaxUses" placeholder="ว่าง = ไม่จำกัด" min="1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">ยอดขั้นต่ำ (บาท)</label>
+                <input type="number" class="form-input" id="newMinAmount" placeholder="0 = ไม่มีขั้นต่ำ" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">วันหมดอายุ</label>
+                <input type="date" class="form-input" id="newValidUntil">
+            </div>
+        </div>
+        <div class="form-actions">
+            <button class="btn-cancel" onclick="toggleForm()">ยกเลิก</button>
+            <button class="btn-save" onclick="saveCoupon()">💾 บันทึกคูปอง</button>
+        </div>
+        <div class="form-msg" id="formMsg"></div>
+    </div>
+
+    <div class="table-section">
+        <div class="table-header">
+            <div class="table-title">รายการคูปองทั้งหมด</div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>รหัสคูปอง</th>
+                    <th>ประเภท</th>
+                    <th>ส่วนลด</th>
+                    <th>ยอดขั้นต่ำ</th>
+                    <th>ใช้ไปแล้ว</th>
+                    <th>สูงสุด</th>
+                    <th>ลดไปทั้งหมด</th>
+                    <th>หมดอายุ</th>
+                    <th>สถานะ</th>
+                </tr>
+            </thead>
+            <tbody id="couponsTable">
+                <tr class="empty-row"><td colspan="9">กำลังโหลด...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+async function loadCoupons() {
+    const tbody = document.getElementById('couponsTable');
+    try {
+        const res  = await fetch('/api/admin/coupons');
+        const data = await res.json();
+
+        document.getElementById('lastUpdate').innerText =
+            'อัปเดตล่าสุด: ' + new Date().toLocaleString('th-TH');
+
+        if (!data.coupons || data.coupons.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">ยังไม่มีคูปอง</td></tr>';
+            return;
+        }
+
+        const totalDiscount = data.coupons.reduce((s, c) => s + parseFloat(c.total_discount || 0), 0);
+        const totalUses     = data.coupons.reduce((s, c) => s + parseInt(c.current_uses || 0), 0);
+        document.getElementById('totalCoupons').innerText  = data.coupons.length;
+        document.getElementById('totalDiscount').innerText = totalDiscount.toLocaleString();
+        document.getElementById('totalUses').innerText     = totalUses.toLocaleString();
+
+        tbody.innerHTML = data.coupons.map(c => `
+            <tr>
+                <td style="color:#ffaa00; font-weight:700;">🎟️ ${c.code}</td>
+                <td style="color:#aaa;">${c.discount_type === 'percentage' ? '% เปอร์เซ็นต์' : '฿ คงที่'}</td>
+                <td style="color:#4499ff; font-weight:700;">
+                    ${c.discount_type === 'percentage' ? `${c.discount_value}%` : `฿${parseFloat(c.discount_value).toLocaleString()}`}
+                </td>
+                <td style="color:#4a6080;">฿${parseFloat(c.min_amount || 0).toLocaleString()}</td>
+                <td style="color:#fff; font-weight:600;">${c.current_uses} ครั้ง</td>
+                <td style="color:#4a6080;">${c.max_uses ?? '∞'}</td>
+                <td style="color:#00cc44; font-weight:700;">฿${parseFloat(c.total_discount || 0).toLocaleString()}</td>
+                <td style="color:#2a5080; font-size:0.82rem;">
+                    ${c.valid_until ? new Date(c.valid_until).toLocaleDateString('th-TH') : '—'}
+                </td>
+                <td>
+                    <button class="toggle-btn ${c.is_active ? 'on' : ''}"
+                        onclick="toggleCoupon(${c.id})">
+                        ${c.is_active ? '✅ เปิดใช้' : '❌ ปิด'}
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="9" style="color:#ff4444;">โหลดไม่สำเร็จ</td></tr>';
+    }
+}
+
+function toggleForm() {
+    document.getElementById('addCouponForm').classList.toggle('show');
+    document.getElementById('formMsg').innerText = '';
+}
+
+async function saveCoupon() {
+    const code      = document.getElementById('newCode').value.trim().toUpperCase();
+    const type      = document.getElementById('newType').value;
+    const value     = parseFloat(document.getElementById('newValue').value);
+    const maxUses   = document.getElementById('newMaxUses').value || null;
+    const minAmount = parseFloat(document.getElementById('newMinAmount').value) || 0;
+    const validUntil = document.getElementById('newValidUntil').value || null;
+    const msg       = document.getElementById('formMsg');
+
+    if (!code || !value) {
+        msg.className = 'form-msg error';
+        msg.innerText = '❌ กรุณากรอกรหัสคูปองและค่าส่วนลด';
+        return;
+    }
+
+    msg.className = 'form-msg';
+    msg.innerText = 'กำลังบันทึก...';
+
+    try {
+        const res  = await fetch('/api/admin/coupons', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, discount_type: type, discount_value: value, max_uses: maxUses, min_amount: minAmount, valid_until: validUntil })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            msg.className = 'form-msg success';
+            msg.innerText = '✅ สร้างคูปองสำเร็จ!';
+            ['newCode','newValue','newMaxUses','newValidUntil'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('newMinAmount').value = '0';
+            loadCoupons();
+            setTimeout(() => { toggleForm(); msg.innerText = ''; }, 1500);
+        } else {
+            msg.className = 'form-msg error';
+            msg.innerText = `❌ ${data.error || 'บันทึกไม่สำเร็จ'}`;
+        }
+    } catch (e) {
+        msg.className = 'form-msg error';
+        msg.innerText = '❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้';
+    }
+}
+
+async function toggleCoupon(id) {
+    try {
+        await fetch(`/api/admin/coupons/${id}/toggle`, { method: 'PATCH' });
+        loadCoupons();
+    } catch (e) {
+        alert('ไม่สามารถเปลี่ยนสถานะได้');
+    }
+}
+
+loadCoupons();
+</script>
+</body>
+</html>

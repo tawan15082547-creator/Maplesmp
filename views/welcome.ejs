@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapleSMP | ยินดีต้อนรับ</title>
+    <link rel="stylesheet" href="/css/welcome.css">
+    <style>
+        .site-logo {
+            max-width: 420px;
+            width: 550px;
+            height: auto;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 20px rgba(100, 200, 255, 0.4));
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/logoweb.png">
+</head>
+<body>
+    <div class="welcome-container">
+        <img src="/images/logo.png" alt="MAPLESMP Logo" class="site-logo">
+        
+        <div class="slider-container" id="sliderContainer">
+            <div class="slider-bg" id="sliderBg"></div>
+            <div class="slider-text">ลากเพื่อเข้าสู่เว็บไซต์</div>
+            <div class="slider-thumb" id="sliderThumb">>></div>
+        </div>
+    </div>
+
+    <script src="/js/welcome.js"></script>
+</body>
+</html>

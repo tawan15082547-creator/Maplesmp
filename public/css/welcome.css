@@ -1,0 +1,101 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Kanit', sans-serif;
+}
+
+body {
+    background-color: #0a0a0f; /* ดำสนิทอมน้ำเงินนิดๆ */
+    background-image: radial-gradient(circle at center, #0d1a33 0%, #050a1a 100%);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.welcome-container {
+    text-align: center;
+    z-index: 10;
+}
+
+.title {
+    font-size: 5rem;
+    font-weight: 800;
+    color: #003d99; /* น้ำเงิน */
+    text-shadow: 0 0 20px rgba(0, 61, 153, 0.8), 2px 2px 5px #000;
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #888888;
+    margin-bottom: 60px;
+    font-weight: 300;
+}
+
+/* รูปร่างของแถบลาก */
+.slider-container {
+    position: relative;
+    width: 320px;
+    height: 60px;
+    background-color: #111111;
+    border: 2px solid #001a4d;
+    border-radius: 40px;
+    margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0, 61, 153, 0.4);
+}
+
+/* สีแดงเวลาลากผ่าน */
+.slider-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background-color: #003d99;
+    border-radius: 40px 0 0 40px;
+}
+
+.slider-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #99ccff;
+    font-weight: 500;
+    pointer-events: none; /* เพื่อไม่ให้เมาส์ไปโดนตัวหนังสือตอนลาก */
+    z-index: 2;
+}
+
+/* ปุ่มกลมๆ สำหรับจับลาก */
+.slider-thumb {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 46px;
+    height: 46px;
+    background-color: #003d99;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 800;
+    cursor: grab;
+    z-index: 3;
+    transition: background-color 0.3s;
+}
+
+.slider-thumb:hover {
+    background-color: #0055ff;
+}
+
+.slider-thumb:active {
+    cursor: grabbing;
+}

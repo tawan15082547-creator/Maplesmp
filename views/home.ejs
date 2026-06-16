@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapleSMP | ร้านค้าหลัก</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/logoweb.png">
+</head>
+<body style="background-image: url('/images/background.png'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <nav class="navbar">
+        <div class="navbar-left">
+            <!-- ปุ่ม Hamburger 3 ขีด -->
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="เมนู">
+                <span></span><span></span><span></span>
+            </button>
+            <a href="https://discord.gg/maplesmpth" target="_blank" class="drawer-social discord-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.11 18.1.127 18.11a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                
+            </a>
+            <a href="https://facebook.com/" target="_blank" class="drawer-social facebook-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                
+            </a>
+</div>
+        </div>
+
+        <div class="navbar-center">
+            <img src="/images/logo.png" alt="MAPLESMP Logo" style="height:80px; width:auto; filter:drop-shadow(0 0 8px rgba(100,200,255,0.35));" class="navbar-logo">
+        </div>
+
+        <div class="nav-links">
+            <div class="cart-icon-container" id="cartBtn">
+                <span class="cart-icon">🛒</span>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </div>
+            <button class="login-btn" id="loginBtn">เข้าสู่ระบบ</button>
+        </div>
+    </nav>
+
+    <!-- Overlay ด้านหลัง drawer -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- Drawer เมนู -->
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <span class="drawer-title">เมนู</span>
+            <button class="drawer-close" id="drawerClose">&times;</button>
+        </div>
+        <div class="drawer-body">
+            <button class="drawer-tab active" data-category="Gems">GEM</button>
+            <button class="drawer-tab" data-category="Ranks">RANK</button>
+            <button class="drawer-tab" data-category="Items">ITEM</button>
+            <button class="drawer-tab" data-category="Milestone">รางวัลสะสม</button>
+            <button class="drawer-tab" data-category="History">HISTORY</button>
+            <div class="drawer-divider"></div>
+            <!-- 🔐 ปุ่ม Admin — ซ่อนไว้ก่อน แสดงเฉพาะ admin -->
+            <a href="/admin/dashboard" id="adminDashboardBtn" class="drawer-social" 
+               style="display:none; background:linear-gradient(135deg,#003d99,#0055ff); color:#fff; font-weight:700;">
+                ⚙️ Admin Dashboard
+            </a>
+            <div class="drawer-divider" id="adminDivider" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="shop-header">
+            <h1>ร้านค้าไอเทม</h1>
+            <p id="shopSubtitle">เลือกซื้อ Gems, ยศ, และไอเทมสุดโหดเพื่อเอาชีวิตรอด</p>
+        </header>
+
+        <div class="products-grid" id="productsGrid">
+            <div class="loading">กำลังโหลดข้อมูลสินค้า...</div>
+        </div>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-content">
+            <span class="close-btn" id="closeCartModal">&times;</span>
+            <h2>🛒 ตะกร้าสินค้าของคุณ</h2>
+            
+            <div class="cart-items-list" id="cartItemsList">
+                <p style="color: #666; padding: 20px 0;">ไม่มีสินค้าในตะกร้า</p>
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>ราคารวมทั้งหมด:</span>
+                    <span class="total-price"><span id="cartTotalPrice">0</span> THB</span>
+                </div>
+                <button class="checkout-btn" id="checkoutBtn">ดำเนินการชำระเงิน ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <div id="loginFormContainer">
+                <h2>เข้าสู่ระบบ</h2>
+                <p style="color:#888; font-size:0.85rem; margin-bottom:16px;">ใช้ชื่อผู้เล่นและรหัสผ่านจากเซิร์ฟเวอร์ Minecraft</p>
+                <form id="loginForm">
+                    <input type="text" id="loginUsername" placeholder="ชื่อตัวละคร (Username)" required>
+                    <input type="password" id="loginPassword" placeholder="รหัสผ่าน" required>
+                    <p id="loginError" style="color:#ff4444; font-size:0.9rem; margin:5px 0;"></p>
+                    <button type="submit" class="submit-btn">เข้าสู่ระบบ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content payment-content">
+            <span class="close-btn" id="closePaymentModal">&times;</span>
+            <h2>บิลชำระเงิน (PromptPay)</h2>
+            
+            <div class="bill-details">
+                <p><strong>รายการสั่งซื้อรวม</strong></p>
+                <p><strong>ยอดรวมสุทธิ:</strong> <span id="billProductPrice">-</span> THB</p>
+                <p class="pay-timer">⚠️ กรุณาชำระเงินภายใน 10 นาที</p>
+            </div>
+
+            <div class="qrcode-container">
+                <img id="qrcodeImg" src="" alt="PromptPay QR Code">
+            </div>
+
+            <div class="payment-status-box">
+                <div class="spinner"></div>
+                <p id="paymentStatusText">กำลังรอการชำระเงินของคุณ...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="checkoutModal" class="modal checkout-modal">
+        <div class="modal-content checkout-content">
+            <span class="close-btn" id="closeCheckoutModal">&times;</span>
+            
+            <div class="checkout-container">
+                <div class="checkout-left">
+                    <h3>สินค้าที่เลือก</h3>
+                    <div class="checkout-items" id="checkoutItems">
+                        </div>
+                </div>
+
+                <div class="checkout-right">
+                    <div class="checkout-section">
+                        <label>ใส่รหัสคูปองส่วนลด</label>
+                        <div class="coupon-input-group">
+                            <input type="text" id="couponCode" placeholder="เช่น WELCOME10" maxlength="50">
+                            <button id="applyCouponBtn" class="btn-apply">ใช้</button>
+                        </div>
+                        <p id="couponMessage" style="color: #999; font-size: 0.9rem; margin-top: 5px;"></p>
+                        <div id="couponDetails" style="display: none; margin-top: 10px; padding: 10px; background: #0c2a0c; border-radius: 8px;">
+                            <p style="color: #00ff00;">✅ ใช้คูปองสำเร็จ!</p>
+                            <p id="discountDisplay"></p>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <label>เลือกวิธีชำระเงิน</label>
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="PromptPay" checked>
+                                <span>PromptPay</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section summary">
+                        <div class="summary-row">
+                            <span>ยอดรวม:</span>
+                            <span id="summaryTotal">0</span> THB
+                        </div>
+                        <div class="summary-row" id="discountRow" style="display: none;">
+                            <span>ส่วนลด:</span>
+                            <span id="summaryDiscount" style="color: #00ff00;">-0</span> THB
+                        </div>
+                        <div class="summary-row total">
+                            <span>สรุปรวม:</span>
+                            <span id="summaryFinal">0</span> THB
+                        </div>
+                        <button id="proceedBtn" class="btn-proceed">ดำเนินการชำระเงิน</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content confirmation-content">
+            <span class="close-btn" id="closeConfirmationModal">&times;</span>
+            <h2>⚠️ ยืนยันการชำระเงิน</h2>
+            
+            <div class="confirmation-header">
+                <p><strong>ชื่อผู้เล่น:</strong> <span id="confirmPlayerName" style="color: #ffaa00;"></span></p>
+            </div>
+
+            <div class="confirmation-terms">
+                <h4>📋 โปรดอ่านก่อนชำระเงิน</h4>
+                <ul class="terms-list">
+                    <li>สินค้าดิจิทัลทั้งหมดจะถูกส่งเข้าเกมตามชื่อผู้เล่นที่ระบุไว้ด้านบน</li>
+                    <li>กรุณาตรวจสอบชื่อผู้เล่นให้ถูกต้องก่อนชำระเงิน หากกรอกผิดระบบอาจส่งสินค้าไปยังบัญชีอื่น</li>
+                    <li>เมื่อชำระเงินสำเร็จแล้ว จะถือว่าผู้ใช้งานยอมรับเงื่อนไขของร้านโดยสมบูรณ์</li>
+                    <li>สินค้าดิจิทัลไม่สามารถขอคืนเงินหรือยกเลิกภายหลังได้</li>
+                    <li>หากชำระเงินแล้วไม่ได้รับสินค้า กรุณาติดต่อทีมงานพร้อมหลักฐานการชำระเงิน</li>
+                    <li>การดำเนินการต่อถือว่าคุณยอมรับกฎ ระเบียบ และเงื่อนไขของร้านค้าเซิร์ฟเวอร์</li>
+                </ul>
+            </div>
+
+            <div class="confirmation-buttons">
+                <button id="backBtn" class="btn-back">◀ กลับไป</button>
+                <button id="confirmPaymentBtn" class="btn-confirm">✓ ดำเนินการชำระเงิน</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="paymentPage" class="modal payment-page">
+        <div class="modal-content payment-page-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; position: relative; width: 100%;">
+                    <h2>💳 ชำระเงิน สแกน QR และตรวจสอบสถานะคำสั่งซื้อของคุณ</h2>
+                    <button onclick="window.location.href='/home'" class="close-receipt-btn">
+                        &times;
+                    </button
+                    style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #999;" >
+            </div>
+            <div class="payment-body">
+                <div class="payment-left">
+                    <h3 id="paymentMethodTitle">PromptPay</h3>
+                    <div class="qrcode-display">
+                        <img id="paymentQrImg" src="" alt="QR Code">
+                    </div>
+                    <button id="downloadQrBtn" class="btn-download">📥 บันทึกรูป QR Code</button>
+                    <div class="payment-summary">
+                        <p><strong>ยอดชำระ:</strong> <span id="paymentAmount">0</span> THB</p>
+                        <p class="timer"><strong>⏱️ เวลาคงเหลือ:</strong> <span id="countdownTimer">15:00</span></p>
+                    </div>
+
+                    <div class="slip-upload-box" style="margin-top: 20px; padding: 15px; border: 2px dashed #ffaa00; border-radius: 8px; background: rgba(255, 170, 0, 0.05); text-align: left;">
+                        <h4 style="margin: 0 0 10px 0; color: #ffaa00; font-family: 'Kanit', sans-serif;">🧾 โอนเงินเสร็จแล้ว? อัปโหลดสลิปที่นี่</h4>
+                        <form id="slipForm" enctype="multipart/form-data">
+                            <input type="hidden" id="slipOrderId" name="orderId">
+                            
+                            <div style="margin-bottom: 12px;">
+                                <input type="file" id="slipImage" name="slipImage" accept="image/*" required style="width: 100%; color: #fff;">
+                            </div>
+                            
+                            <button type="submit" id="btnSubmitSlip" style="width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; font-family: 'Kanit', sans-serif; cursor: pointer; font-size: 1rem; transition: background 0.2s;">
+                                🚀 ตรวจสอบสลิปและเติมพ้อยท์
+                            </button>
+                        </form>
+                        <div id="slipStatusMessage" style="margin-top: 10px; font-size: 0.95rem; font-weight: bold; text-align: center; font-family: 'Kanit', sans-serif;"></div>
+                    </div>
+
+                </div>
+
+                <div class="payment-right">
+                    <h3>📝 ข้อมูลคำสั่งซื้อ</h3>
+                    <div class="order-details">
+                        <p><strong>รหัสคำสั่งซื้อ:</strong> <span id="orderId"></span></p>
+                        <p><strong>ชื่อผู้เล่น:</strong> <span id="orderPlayerName"></span></p>
+                        <p><strong>วิธีชำระเงิน:</strong> <span id="orderPaymentMethod"></span></p>
+                        <p><strong>สั่งซื้อเมื่อ:</strong> <span id="orderDateTime"></span></p>
+                        <p><strong>สรุปยอด:</strong> <span id="orderTotal" style="color: #ff4444; font-weight: bold;"></span> THB</p>
+                    </div>
+
+                    <h4 style="margin-top: 20px;">รายการสินค้า</h4>
+                    <div class="order-items" id="orderItemsList">
+                        </div>
+
+                    <div class="payment-status" id="paymentStatusSection">
+                        <div class="spinner"></div>
+                        <p id="paymentStatusMsg">กำลังรอการชำระเงิน...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content success-content">
+            <div class="success-icon">✅</div>
+            <h2>ชำระเงินเสร็จสิ้น!</h2>
+            <p>สินค้าของคุณกำลังถูกส่งเข้าเกม</p>
+            <p style="color: #999; font-size: 0.9rem; margin-top: 10px;">กำลังกลับไปหน้าหลัก...</p>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content history-content">
+            <span class="close-btn" id="closeHistoryModal">&times;</span>
+            <h2>📊 ประวัติการเติมเงิน</h2>
+            
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>ออเดอร์ ID</th>
+                        <th>สินค้า</th>
+                        <th>ราคา (THB)</th>
+                        <th>วันและเวลา</th>
+                    </tr>
+                </thead>
+                <tbody id="historyList">
+                    <tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">กำลังโหลด...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/items.js"></script>
+    <script src="/js/payment.js"></script>
+    <script src="/js/rank.js"></script>
+
+    <!-- ===== MILESTONE SECTION ===== -->
+    <div id="milestoneSection" style="display:none;" class="milestone-section">
+        <div class="milestone-header">
+            <h2>🎯 รางวัลสะสมยอดเติม</h2>
+            <p>เติมเงินสะสมถึงเกณฑ์ กดรับรางวัลพิเศษได้เลย!</p>
+        </div>
+        <div class="milestone-track">
+            <div class="milestone-progress-bar">
+                <div class="milestone-fill" id="milestoneFill" style="width: 0%;"></div>
+            </div>
+            <div class="milestone-nodes">
+                <% 
+                const milestones = [
+                    { amount: 299,  label: '299฿',  reward: 'กล่องสุ่ม S', icon: '🎁' },
+                    { amount: 999,  label: '999฿',  reward: 'ชุดเกราะพิเศษ', icon: '🛡️' },
+                    { amount: 1999, label: '1,999฿', reward: 'ปีก Elytra สุดหรู', icon: '🪽' },
+                    { amount: 2999, label: '2,999฿', reward: 'กล่องสุ่ม XL', icon: '🎀' },
+                    { amount: 4999, label: '4,999฿', reward: 'Custom Tag สีพิเศษ', icon: '✨' },
+                    { amount: 7999, label: '7,999฿', reward: 'VIP เพิ่ม 30 วัน', icon: '👑' },
+                    { amount: 9999, label: '9,999฿', reward: 'Title: [Legend]', icon: '🏆' },
+                ];
+                %>
+            </div>
+        </div>
+        <div class="milestone-cards" id="milestoneCards">
+            <!-- render by JS below -->
+        </div>
+    </div>
+
+    <style>
+    /* ===== GEMS MARKETING STYLES ===== */
+    .product-card .gems-bonus-badge {
+        background: linear-gradient(135deg, #ff6b00, #ffaa00);
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: bold;
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 8px;
+        box-shadow: 0 2px 8px rgba(255,170,0,0.4);
+        animation: pulse-badge 2s infinite;
+    }
+    @keyframes pulse-badge {
+        0%, 100% { box-shadow: 0 2px 8px rgba(255,170,0,0.4); }
+        50% { box-shadow: 0 2px 16px rgba(255,170,0,0.8); }
+    }
+    .product-card .gems-display {
+        font-size: 1.3rem;
+        margin: 4px 0 2px 0;
+        color: #ff6262;
+    }
+    .product-card .gems-base {
+        color: #ccc;
+        font-size: 1rem;
+    }
+    .product-card .gems-bonus-extra {
+        color: #ffaa00;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    .product-card .gems-unit {
+        color: #888;
+        font-size: 0.85rem;
+    }
+    .product-card .price-original {
+        color: #666;
+        font-size: 0.85rem;
+        margin: 2px 0 0 0;
+        text-decoration: line-through;
+    }
+    .product-card .price-sale {
+    /* ลบบรรทัด color หรือใส่ // นำหน้าเพื่อยกเลิกการทำงาน */
+    color: #21b452e3 !important; 
+    font-size: 1.5rem !important;
+    margin: 2px 0 6px 0 !important;
+    
+    /* การจัดกึ่งกลาง */
+    display: flex;
+    justify-content: center; /* เพิ่มบรรทัดนี้เพื่อให้ราคาอยู่กลางกล่อง */
+    align-items: center;
+    gap: 8px;
+    }
+    .product-card .sale-tag {
+        background: #ff4444;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: bold;
+        padding: 2px 7px;
+        border-radius: 10px;
+        vertical-align: middle;
+    }
+
+    /* ===== MILESTONE STYLES ===== */
+    .milestone-section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .milestone-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .milestone-header h2 { color: #ffaa00; margin-bottom: 6px; }
+    .milestone-header p { color: #888; font-size: 0.95rem; }
+
+    .milestone-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+    }
+    .milestone-card {
+        background: rgba(255,255,255,0.04);
+        border: 2px solid #333;
+        border-radius: 14px;
+        padding: 18px 12px;
+        text-align: center;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    .milestone-card.locked { opacity: 0.5; filter: grayscale(60%); }
+    .milestone-card.unlocked { border-color: #ffaa00; box-shadow: 0 0 16px rgba(255,170,0,0.25); }
+    .milestone-card.claimed { border-color: #00ff88; background: rgba(0,255,136,0.06); }
+    .milestone-card .ms-icon { font-size: 2.2rem; display: block; margin-bottom: 8px; }
+    .milestone-card .ms-amount { color: #ffaa00; font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
+    .milestone-card .ms-reward { color: #aaa; font-size: 0.8rem; margin-bottom: 12px; line-height: 1.4; }
+    .milestone-card .ms-btn {
+        display: inline-block;
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        font-family: 'Kanit', sans-serif;
+        transition: 0.2s;
+    }
+    .ms-btn.btn-claim   { background: #ffaa00; color: #000; }
+    .ms-btn.btn-claim:hover { background: #ffd000; }
+    .ms-btn.btn-locked  { background: #333; color: #666; cursor: not-allowed; }
+    .ms-btn.btn-claimed { background: #00ff88; color: #000; cursor: default; }
+    .milestone-card .ms-claimed-stamp {
+        position: absolute;
+        top: 6px; right: 8px;
+        font-size: 1.1rem;
+    }
+    </style>
+
+    <script>
+    // ===== MILESTONE RENDER =====
+    const MILESTONES = [
+        { amount: 299,  label: '299 ฿',   reward: 'กล่องสุ่ม S',        icon: '🎁' },
+        { amount: 999,  label: '999 ฿',   reward: 'ชุดเกราะพิเศษ',      icon: '🛡️' },
+        { amount: 1999, label: '1,999 ฿', reward: 'ปีก Elytra สุดหรู',  icon: '🪽' },
+        { amount: 2999, label: '2,999 ฿', reward: 'กล่องสุ่ม XL',       icon: '🎀' },
+        { amount: 4999, label: '4,999 ฿', reward: 'Custom Tag สีพิเศษ', icon: '✨' },
+        { amount: 7999, label: '7,999 ฿', reward: 'VIP เพิ่ม 30 วัน',  icon: '👑' },
+        { amount: 9999, label: '9,999 ฿', reward: 'Title: [Legend]',    icon: '🏆' },
+    ];
+
+    function renderMilestones() {
+        const container = document.getElementById('milestoneCards');
+        if (!container) return;
+
+        // สมมติยอดสะสมจาก currentUser.total_donated หรือ 0
+        const totalDonated = (currentUser && currentUser.total_donated) ? parseFloat(currentUser.total_donated) : 0;
+        // claimed ดึงจาก localStorage (UI only ตอนนี้ ยังไม่มี backend)
+        const claimed = JSON.parse(localStorage.getItem('ms_claimed') || '[]');
+
+        container.innerHTML = '';
+        MILESTONES.forEach((ms, i) => {
+            const unlocked = totalDonated >= ms.amount;
+            const isClaimed = claimed.includes(ms.amount);
+            let stateClass = 'locked';
+            let btnHtml = `<button class="ms-btn btn-locked" disabled>🔒 ล็อก (${ms.label})</button>`;
+            let stamp = '';
+
+            if (isClaimed) {
+                stateClass = 'claimed';
+                btnHtml = `<button class="ms-btn btn-claimed" disabled>✅ รับแล้ว</button>`;
+                stamp = `<span class="ms-claimed-stamp">✅</span>`;
+            } else if (unlocked) {
+                stateClass = 'unlocked';
+                btnHtml = `<button class="ms-btn btn-claim" onclick="claimMilestone(${ms.amount})">🎁 กดรับ</button>`;
+            }
+
+            container.innerHTML += `
+                <div class="milestone-card ${stateClass}">
+                    ${stamp}
+                    <span class="ms-icon">${ms.icon}</span>
+                    <div class="ms-amount">${ms.label}</div>
+                    <div class="ms-reward">${ms.reward}</div>
+                    ${btnHtml}
+                </div>
+            `;
+        });
+    }
+
+    function claimMilestone(amount) {
+        if (!currentUser) {
+            alert('⚠️ กรุณาเข้าสู่ระบบก่อนกดรับรางวัล');
+            return;
+        }
+        // TODO: เชื่อม API หลังบ้านจริง
+        const claimed = JSON.parse(localStorage.getItem('ms_claimed') || '[]');
+        if (!claimed.includes(amount)) {
+            claimed.push(amount);
+            localStorage.setItem('ms_claimed', JSON.stringify(claimed));
+        }
+        alert('🎉 กดรับรางวัลสำเร็จ! ทีมงานจะส่งของให้ในเร็วๆนี้');
+        renderMilestones();
+    }
+    </script>
+
+    <script>
+    // ===== ระบบสมัครสมาชิก =====
+    document.addEventListener('DOMContentLoaded', () => {
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const username    = document.getElementById('regUsername').value.trim();
+                const password    = document.getElementById('regPassword').value;
+                const gameVersion = document.getElementById('regGameVersion').value;
+                const errMsg      = document.getElementById('registerError');
+                const sucMsg      = document.getElementById('registerSuccess');
+
+                errMsg.innerText = '';
+                sucMsg.innerText = '';
+
+                if (!username || !password) {
+                    errMsg.innerText = 'กรุณากรอกข้อมูลให้ครบ';
+                    return;
+                }
+
+                try {
+                    const res  = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password, game_version: gameVersion })
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        errMsg.innerText = data.error || 'สมัครสมาชิกไม่สำเร็จ';
+                        return;
+                    }
+
+                    sucMsg.innerText = '✅ สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ';
+                    registerForm.reset();
+                    // สลับไปหน้า login หลัง 1.5 วินาที
+                    setTimeout(() => {
+                        document.getElementById('registerFormContainer').style.display = 'none';
+                        document.getElementById('loginFormContainer').style.display = 'block';
+                        sucMsg.innerText = '';
+                    }, 1500);
+
+                } catch (err) {
+                    errMsg.innerText = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้';
+                }
+            };
+        }
+
+        // ===== ฟังก์ชันคำนวณราคาสุทธิหลังหักส่วนลด =====
+    function calculateFinalPrice(baseTotal) {
+        const finalTotal = Math.max(0, Math.round((baseTotal - currentDiscount) * 100) / 100);
+        document.getElementById('summaryTotal').innerText = baseTotal.toLocaleString();
+        document.getElementById('summaryFinal').innerText = finalTotal.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ===== ระบบคูปองส่วนลด =====
+        const applyCouponBtn = document.getElementById('applyCouponBtn');
+        if (applyCouponBtn) {
+            applyCouponBtn.onclick = async () => {
+                const code    = document.getElementById('couponCode').value.trim();
+                const total   = parseInt(document.getElementById('summaryTotal').innerText.replace(/,/g, '')) || 0;
+                const msgEl   = document.getElementById('couponMessage');
+                const detailEl = document.getElementById('couponDetails');
+                const discountDisplay = document.getElementById('discountDisplay');
+                const discountRow = document.getElementById('discountRow');
+                const summaryDiscount = document.getElementById('summaryDiscount');
+
+                if (!code) { msgEl.innerText = 'กรุณากรอกรหัสคูปอง'; return; }
+                if (total <= 0) { msgEl.innerText = 'ไม่มีสินค้าในตะกร้า'; return; }
+
+                msgEl.innerText = 'กำลังตรวจสอบ...';
+                msgEl.style.color = '#ffaa00';
+
+                try {
+                    const res  = await fetch('/api/payment/apply-coupon', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code, amount: total })
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        msgEl.innerText = data.error || 'คูปองไม่ถูกต้อง';
+                        msgEl.style.color = '#ff4444';
+                        detailEl.style.display = 'none';
+                        currentDiscount = 0;
+                        calculateFinalPrice(total);
+                        return;
+                    }
+
+                    // ใช้คูปองสำเร็จ
+                    currentDiscount = data.discount;
+                    msgEl.innerText = '';
+                    detailEl.style.display = 'block';
+                    discountDisplay.innerText = `ส่วนลด: ${data.discount.toLocaleString()} THB`;
+                    discountRow.style.display = 'flex';
+                    summaryDiscount.innerText = `-${data.discount.toLocaleString()}`;
+                    calculateFinalPrice(total);
+
+                } catch (err) {
+                    msgEl.innerText = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้';
+                    msgEl.style.color = '#ff4444';
+                }
+            };
+        }
+    });
+
+    // ===== Drawer / Hamburger Menu =====
+    const hamburgerBtn  = document.getElementById('hamburgerBtn');
+    const drawer        = document.getElementById('drawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawerClose   = document.getElementById('drawerClose');
+
+    function openDrawer() {
+        drawer.classList.add('open');
+        drawerOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        drawer.classList.remove('open');
+        drawerOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    hamburgerBtn.addEventListener('click', openDrawer);
+    drawerClose.addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+
+    // swipe ซ้ายเพื่อปิด drawer (รองรับมือถือ)
+    let touchStartX = 0;
+    drawer.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    drawer.addEventListener('touchend', e => {
+        if (touchStartX - e.changedTouches[0].clientX > 60) closeDrawer();
+    });
+
+    // drawer tabs — สลับหมวดหมู่สินค้า
+    document.querySelectorAll('.drawer-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const category = tab.getAttribute('data-category');
+
+            if (category === 'History') {
+                closeDrawer();
+                if (!currentUser) {
+                    alert('⚠️ กรุณาเข้าสู่ระบบก่อนดูประวัติการเติมเงินครับ');
+                    document.getElementById('authModal').style.display = 'flex';
+                    return;
+                }
+                document.getElementById('historyModal').style.display = 'flex';
+                if (typeof fetchWalletHistory === 'function') fetchWalletHistory();
+                return;
+            }
+
+            document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            activeCategory = category;
+            loadProducts(category);
+            if (typeof updateShopHeader === 'function') updateShopHeader(category); // ✅
+            
+            closeDrawer();
+        });
+    });
+
+    // ===== CHECKOUT FLOW =====
+
+    // ขั้น 1: ตะกร้า → checkoutModal
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.onclick = () => {
+            if (cart.length === 0) return alert('กรุณาเลือกสินค้าก่อนครับ');
+            if (!currentUser)     return alert('กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อครับ');
+
+            document.getElementById('cartModal').style.display     = 'none';
+            document.getElementById('checkoutModal').style.display = 'flex';
+
+            const list = document.getElementById('checkoutItems');
+            list.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                list.innerHTML += `<p style="color:#ccc;margin-bottom:6px;">📦 ${item.name} (x${item.quantity}) — ${(item.price*item.quantity).toLocaleString()} THB</p>`;
+            });
+            currentDiscount = 0;
+            const discountRow   = document.getElementById('discountRow');
+            const couponDetails = document.getElementById('couponDetails');
+            if (discountRow)   discountRow.style.display   = 'none';
+            if (couponDetails) couponDetails.style.display = 'none';
+            document.getElementById('summaryTotal').innerText = total.toLocaleString();
+            document.getElementById('summaryFinal').innerText = total.toLocaleString();
+        };
+    }
+
+    // ขั้น 2: checkoutModal → confirmationModal
+    const proceedBtn = document.getElementById('proceedBtn');
+    if (proceedBtn) {
+        proceedBtn.onclick = () => {
+            document.getElementById('checkoutModal').style.display    = 'none';
+            document.getElementById('confirmationModal').style.display = 'flex';
+            document.getElementById('confirmPlayerName').innerText     = currentUser.username;
+        };
+    }
+
+    // ปุ่มกลับ
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.onclick = () => {
+            document.getElementById('confirmationModal').style.display = 'none';
+            document.getElementById('checkoutModal').style.display     = 'flex';
+        };
+    }
+
+    // ขั้น 3: ยืนยัน → redirect ไปหน้า /payment
+    const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+    if (confirmPaymentBtn) {
+        confirmPaymentBtn.onclick = () => {
+            const method      = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'PromptPay';
+            const finalAmount = Math.round(parseFloat(document.getElementById('summaryFinal').innerText.replace(/,/g, '')) * 100) / 100 || 0;
+
+            sessionStorage.setItem('pendingPayment', JSON.stringify({
+                userId:   currentUser.id,
+                username: currentUser.username,
+                amount:   finalAmount,
+                method:   method,
+                items:    cart,
+                dateTime: new Date().toLocaleString('th-TH')
+            }));
+
+            window.location.href = '/payment';
+        };
+    }
+
+    </script>
+</body>
+</html>
