@@ -23,8 +23,6 @@ const MY_PROMPTPAY = '0942253619'; // เบอร์พร้อมเพย์
 router.post('/generate-qr', async (req, res) => {
     const { userId, amount, items, method, paymentAccount } = req.body;
     const paymentMethod = method; // ✅ map ให้ตรงกับที่ frontend ส่งมา
-    console.log('🔍 promptpay-qr:', typeof require('promptpay-qr'));
-    console.log('🔍 qrcode:', typeof require('qrcode'));
 
     console.log('📥 /generate-qr received:', { userId, amount, paymentMethod, items });
 

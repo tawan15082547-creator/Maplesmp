@@ -335,3 +335,44 @@ function updateUserUI() {
         if (adminDivider) adminDivider.style.display = 'block';
     }
 }
+
+// --- ฟังก์ชันดึงประวัติการเติมเงิน ---
+async function fetchWalletHistory() {
+    const historyList = document.getElementById('historyList'); // สมมติว่าใน HTML มีตาราง ID นี้
+    if (!historyList) return;
+
+    historyList.innerHTML = '<tr><td colspan="4" style="text-align:center;">กำลังโหลดข้อมูล...</td></tr>';
+
+    try {
+        // [สำคัญ] เรียก API ที่เราคุยกันก่อนหน้านี้
+        const res = await fetch('/api/payment/wallet/history');
+        const data = await res.json();
+
+        if (!res.ok) {
+            historyList.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">${data.error || 'โหลดประวัติไม่สำเร็จ'}</td></tr>`;
+            return;
+        }
+
+        if (data.orders.length === 0) {
+            historyList.innerHTML = '<tr><td colspan="4" style="text-align:center;">ยังไม่มีประวัติการเติมเงิน</td></tr>';
+            return;
+        }
+
+        // เรนเดอร์ข้อมูลลงในตาราง
+        historyList.innerHTML = '';
+        data.orders.forEach(order => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${order.id}</td>
+                <td>${order.total_price.toLocaleString()} ฿</td>
+                <td>${order.status === 'completed' ? '<span style="color:green;">สำเร็จ</span>' : order.status}</td>
+                <td>${new Date(order.created_at).toLocaleString('th-TH')}</td>
+            `;
+            historyList.appendChild(row);
+        });
+
+    } catch (err) {
+        console.error('History fetch error:', err);
+        historyList.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">เกิดข้อผิดพลาดในการเชื่อมต่อ</td></tr>';
+    }
+}

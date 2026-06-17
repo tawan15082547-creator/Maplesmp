@@ -125,47 +125,31 @@ router.get('/check-status/:orderId', async (req, res) => {
     }
 });
 
-// =================================================================
-// ===== 3. Get Wallet History (ดึงประวัติการสั่งซื้อของผู้เล่น) =====
-// =================================================================
+// ===== 3. Get Wallet History (ดึงประวัติการสั่งซื้อ) =====
 router.get('/wallet/history', async (req, res) => {
-    const userId = req.query.userId || req.session?.userId;
+    // ใช้ userId จาก session
+    const userId = req.session?.userId;
     
     if (!userId) {
         return res.status(401).json({ error: 'กรุณาเข้าสู่ระบบ' });
     }
 
     try {
-        // 🌟 [แก้ไข SQL] เพิ่มเงื่อนไข AND o.status = 'completed' เพื่อดึงเฉพาะรายการที่จ่ายเงินแล้ว
         const [orders] = await db.execute(
-            `SELECT 
-                o.id,
-                u.username as buyer_name,
-                p.name as product_name,
-                oi.quantity,
-                o.total_price,
-                o.gems_amount, 
-                o.payment_method,
-                o.status,
-                o.created_at
-             FROM orders o
-             JOIN users u ON o.user_id = u.id
-             LEFT JOIN order_items oi ON o.id = oi.order_id
-             LEFT JOIN products p ON oi.product_id = p.id
-             WHERE o.user_id = ? AND o.status = 'completed' 
-             ORDER BY o.created_at DESC 
+            `SELECT id, total_price, gems_amount, payment_method, status, created_at 
+             FROM orders 
+             WHERE user_id = ? AND status = 'completed'
+             ORDER BY created_at DESC 
              LIMIT 50`,
             [userId]
         );
 
         res.json({ orders });
-
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการโหลดประวัติ' });
+        console.error('Error fetching history:', error);
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงประวัติ' });
     }
 });
-
 // =================================================================
 // ===== 4. Check Slip (ฟังก์ชัน AI สแกนสลิปผ่าน SlipOK และแปลงเป็นเพชรทันที) =====
 // =================================================================
@@ -386,6 +370,32 @@ router.post('/apply-coupon', async (req, res) => {
     } catch (error) {
         console.error('Apply Coupon Error:', error);
         res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบคูปอง' });
+    }
+});
+
+
+// เพิ่มบรรทัดนี้ลงใน routes/payment.js เพื่อให้หน้าเว็บเรียกใช้ได้
+router.get('/wallet/history', async (req, res) => {
+    // ตรวจสอบว่า User ล็อกอินอยู่หรือไม่
+    if (!req.session || !req.session.userId) {
+        return res.status(401).json({ error: 'กรุณาเข้าสู่ระบบ' });
+    }
+
+    try {
+        const userId = req.session.userId;
+        const [orders] = await db.execute(
+            `SELECT id, total_price, payment_method, status, created_at 
+             FROM orders 
+             WHERE user_id = ? 
+             ORDER BY created_at DESC 
+             LIMIT 50`,
+            [userId]
+        );
+
+        res.json({ orders });
+    } catch (error) {
+        console.error('Error fetching history:', error);
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงประวัติ' });
     }
 });
 
