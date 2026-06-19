@@ -11,8 +11,9 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0,
     connectTimeout: 10000,
-    ssl: { rejectUnauthorized: false }
-});
+// 
+//    ssl: { rejectUnauthorized: false }
+}); 
 
 // 2. log ค่าที่ใช้เชื่อมต่อ
 console.log('🔌 DB Config:', {

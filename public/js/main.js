@@ -324,7 +324,8 @@ function initAuth() {
 function updateUserUI() {
     const loginBtn = document.getElementById('loginBtn');
     if (currentUser && loginBtn) {
-        loginBtn.innerHTML = `👤 ${currentUser.username} | 💎 <span id="navGems">${currentUser.points.toLocaleString()}</span>`;
+        const pts = currentUser.points || 0;
+        loginBtn.innerHTML = `👤 ${currentUser.username} | 💎 <span id="navGems">${pts.toLocaleString()}</span>`;
     }
 
     // 🔐 แสดงปุ่ม Admin Dashboard เฉพาะ admin เท่านั้น

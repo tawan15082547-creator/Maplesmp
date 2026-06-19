@@ -1,4 +1,3 @@
-// routes/payment.js
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
@@ -7,119 +6,68 @@ const axios = require('axios');
 const multer = require('multer');
 const FormData = require('form-data');
 const fs = require('fs');
-const generatePayload = require('promptpay-qr'); // ✅ ย้ายมา top-level
+const generatePayload = require('promptpay-qr'); // ย้ายมาไว้ด้านบน
 
-// ตั้งค่าโฟลเดอร์สำหรับเก็บไฟล์สลิปชั่วคราว
 const upload = multer({ dest: 'uploads/' });
 
-// ตั้งค่ารหัสที่ได้จาก SlipOK 
 const SLIPOK_BRANCH_ID = '68837';
 const SLIPOK_API_KEY = 'SLIPOKG9GHACC';
-const MY_PROMPTPAY = '0942253619'; // เบอร์พร้อมเพย์ของคุณที่ลงทะเบียนไว้กับ SlipOK
+const MY_PROMPTPAY = '0942253619';
 
 // =================================================================
-// ===== 1. Generate QR Code (สร้างออเดอร์ลง DB และเจนภาพพร้อมเพย์) =====
+// ===== 1. Generate QR Code =====
 // =================================================================
 router.post('/generate-qr', async (req, res) => {
     const { userId, amount, items, method, paymentAccount } = req.body;
-    const paymentMethod = method; // ✅ map ให้ตรงกับที่ frontend ส่งมา
-
-    console.log('📥 /generate-qr received:', { userId, amount, paymentMethod, items });
-
-    console.log('❌ validate:', { userId, amount, method, itemsLen: items?.length });
-
-    if (!userId || !amount || amount <= 0 || !method || !items || items.length === 0) {
-        return res.status(400).json({ error: 'ข้อมูลไม่ถูกต้องหรือไม่ครบถ้วน' });
+    
+    if (!userId || !amount || !items) {
+        return res.status(400).json({ error: 'ข้อมูลไม่ถูกต้อง' });
     }
 
-    // ✅ คำนวณ gems รวมจาก items — รับทั้ง diamonds และ gems_reward (frontend อาจส่งชื่อต่างกัน)
-    const targetDiamonds = items.reduce((sum, item) => {
-        const gems = item.diamonds || item.gems_reward || item.gemsReward || 0;
-        return sum + (gems * (item.quantity || 1));
-    }, 0);
-
-    console.log('💎 targetDiamonds คำนวณได้:', targetDiamonds, '| items:', JSON.stringify(items));
-
-
     try {
-        const targetAmount = parseFloat(amount);
+        const targetDiamonds = items.reduce((sum, item) => sum + ((item.gems_reward || item.diamonds || 0) * (item.quantity || 1)), 0);
         const orderId = 'WM-' + Date.now();
 
-        // จัดเตรียมฟิลด์ให้ปลอดภัยตรงตามคอลัมน์ของ SQL
-        const safeUserId = userId || null;
-        const safePaymentMethod = (paymentMethod === 'TrueMoney') ? 'TrueMoney' : 'PromptPay';
-        const safePaymentAccount = paymentAccount || null;
-
-        // 🌟 [แก้ไข] บันทึกออเดอร์ลงตาราง orders โดยเพิ่ม gems_amount เข้าไปด้วย
         await db.execute(
-            `INSERT INTO orders (id, user_id, total_price, gems_amount, payment_method, payment_account, final_amount, status) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [orderId, safeUserId, targetAmount, targetDiamonds, safePaymentMethod, safePaymentAccount, targetAmount, 'pending']
+            `INSERT INTO orders (id, user_id, total_price, gems_amount, payment_method, payment_account, status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [orderId, userId, amount, targetDiamonds, method, paymentAccount, 'pending']
         );
 
-        // บันทึกรายการสินค้าลงตาราง order_items
         for (const item of items) {
-            await db.execute(
-                'INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)',
-                [orderId, item.id, item.quantity, parseInt(item.price) || 0]
-            );
+            await db.execute('INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)',
+                [orderId, item.id, item.quantity, item.price]);
         }
 
-        // สร้าง PromptPay QR payload
-        const promptpayRawData = generatePayload(MY_PROMPTPAY, { amount: targetAmount });
-
-        // แปลงเป็น base64 PNG แบบ async/await
-        const options = { type: 'image/png', color: { dark: '#000000', light: '#ffffff' }, width: 300 };
-        
-        try {
-            const url = await qrcode.toDataURL(promptpayRawData, options);
-            return res.json({
-                success: true,
-                message: 'สร้างบิลสำเร็จ',
-                orderId: orderId,
-                order_id: orderId,
-                qrcode: url
-            });
-        } catch (qrErr) {
-            console.error('QR Code Generation Error:', qrErr);
-            return res.status(500).json({ error: 'ไม่สามารถสร้าง QR Code ได้' });
-        }
-
+        const promptpayRawData = generatePayload(MY_PROMPTPAY, { amount: parseFloat(amount) });
+        qrcode.toDataURL(promptpayRawData, (err, url) => {
+            if (err) return res.status(500).json({ error: 'QR Generation Error' });
+            res.json({ success: true, orderId, QrCode: url });
+        });
     } catch (error) {
-        console.error('Generate PromptPay QR Error:', error);
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดร้ายแรงภายในคิวอาร์ระบบฐานข้อมูล' });
+        res.status(500).json({ error: 'Database Error' });
     }
 });
 
 // =================================================================
-// ===== 2. Check Payment Status (ใช้กับระบบ Polling วนลูปเช็กสถานะบิล) =====
+// ===== 2. Wallet History (แก้ไขให้ดึงจาก req.session.user.id) =====
 // =================================================================
-router.get('/check-status/:orderId', async (req, res) => {
-    const { orderId } = req.params;
+router.get('/wallet/history', async (req, res) => {
+    // แก้ไขจาก req.session.userId เป็น req.session.user.id ตามโครงสร้าง Login ใหม่
+    const userId = req.session?.user?.id; 
+    
+    if (!userId) {
+        return res.status(401).json({ error: 'กรุณาเข้าสู่ระบบ' });
+    }
 
     try {
-        const [orders] = await db.execute('SELECT * FROM orders WHERE id = ?', [orderId]);
-
-        if (orders.length === 0) {
-            return res.status(404).json({ error: 'ไม่พบออเดอร์' });
-        }
-
-        const order = orders[0];
-        
-        if (order.status === 'completed') {
-            // ดึงค่าเพชรปัจจุบัน (คอลัมน์ points) ส่งกลับคืนไปแสดงที่หน้าจอ
-            const [user] = await db.execute('SELECT points FROM users WHERE id = ?', [order.user_id]);
-            res.json({
-                status: 'completed',
-                new_balance: user[0]?.points || 0
-            });
-        } else {
-            res.json({ status: order.status });
-        }
-
+        const [orders] = await db.execute(
+            `SELECT id, total_price, gems_amount, payment_method, status, created_at 
+             FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 50`,
+            [userId]
+        );
+        res.json({ orders });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบสถานะ' });
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงประวัติ' });
     }
 });
 
