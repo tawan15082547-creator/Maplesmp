@@ -29,6 +29,7 @@ app.use('/api/auth', require('./routes/auth.route'));
 app.use('/api/shop', require('./routes/shop.route'));
 app.use('/api/payment', require('./routes/payment.route'));
 app.use('/api/admin', require('./routes/admin.route'));
+app.use('/api/plugin', require('./routes/plugin.route')); // 🎮 Minecraft Plugin API
 app.use('/api', require('./routes/api'));
 
 // 4. หน้าเพจต่างๆ
